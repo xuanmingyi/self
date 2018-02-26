@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: false
+  roles:
+    - { role: install, tag: "all_nodes"}
+
+- hosts: master
+  gather_facts: false
+  roles:
+    - { role: install, tag: "master_node"}
