@@ -1,0 +1,5 @@
+[kubernetes]
+name=Kubernetes
+baseurl=file:///opt/repo
+enabled=1
+gpgcheck=0

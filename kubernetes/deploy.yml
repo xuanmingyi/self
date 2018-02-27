@@ -1,0 +1,10 @@
+---
+- hosts: master
+  roles:
+    - { role: prepare_node}
+    - { role: master_node}
+
+- hosts: slave
+  roles:
+    - { role: prepare_node}
+    - { role: slave_node}

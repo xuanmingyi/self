@@ -1,0 +1,59 @@
+---
+- name: Disable firewalld
+  service: enabled=false name=firewalld state=stopped
+
+- name: Install Packages
+  yum: name=docker
+
+- name: Enable docker
+  service: enabled=true name=docker state=started
+
+- name: Change selinux
+  selinux: policy=disabled state=disabled
+
+- name: Remove swap
+  lineinfile: path=/etc/fstab regexp="swap" state=absent
+  when: ansible_swaptotal_mb > 1
+
+- name: Disable swap
+  command: swapoff -a
+  ignore_errors: yes
+
+- name: Update kernel settings
+  sysctl:
+    name: "{{ item }}"
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+
+- name: Extra data
+  unarchive: 
+    src: "{{ item }}"
+    dest: /opt
+    copy: yes
+  with_items:
+    - repo.tar.gz
+    - image.tar.gz
+
+- name: Copy local repo
+  copy: src=kubernetes.repo dest=/etc/yum.repos.d/kubernetes.repo
+
+- name: Install kubelet
+  yum: name="{{ item }}"
+  with_items:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- name: Restart kubelet
+  service: name=kubelet enabled=true state=started
+
+- name: Load images
+  shell: |
+    for i in `ls /opt/image`; do
+        docker load </opt/image/$i
+    done
