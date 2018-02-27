@@ -1,0 +1,11 @@
+- name: Install Packages (master node)
+  yum: name={{ item }}
+  with_items:
+    - haproxy
+
+- name: Copy haproxy configure
+  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg
+
+- name: Haproxy restart
+  service: name=haproxy state=restarted enabled=true
+

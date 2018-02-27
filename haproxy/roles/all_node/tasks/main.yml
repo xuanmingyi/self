@@ -1,0 +1,11 @@
+---
+- name: Install Packages (all nodes)
+  yum: name={{ item }}
+  with_items:
+    - httpd
+
+- name: apache restart
+  service: name=httpd state=restarted enabled=true
+
+- name: Add HTML
+  raw: echo `hostname` >/usr/share/httpd/noindex/index.html
