@@ -1,0 +1,26 @@
+$num_instances = 3
+$num_per_instances = 2
+$disk_size = "20G"
+$memory = 1024
+
+
+Vagrant.configure("2") do |config|
+
+  config.vm.provider :libvirt do |lv|
+    lv.memory = $memory
+  end
+ 
+  (1..$num_instances).each do |i| 
+    config.vm.define vm_name="ceph-%02d" % [i] do |machine|
+      machine.vm.box = "centos/7"
+      machine.vm.hostname = vm_name
+      machine.vm.provider :libvirt do |lv|
+        driverletters = ('a'..'z').to_a
+        (1..$num_per_instances).each do |n|
+          lv.storage :file, :device => "vd#{driverletters[n]}", :path => "disk-%d-%d.disk" % [i, n], :size => $disk_size, :bus => "virtio"
+        end
+      end
+    end
+  end
+
+end

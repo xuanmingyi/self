@@ -1,0 +1,27 @@
+$num_instances = 3
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "centos/7"
+  config.vm.provider :libvirt do |lv|
+    lv.memory = 2048
+  end
+
+  (1..$num_instances).each do |i|
+    config.vm.define vm_name = "openshift-%02d" % [i] do |machine|
+      machine.vm.hostname = vm_name
+      #if i == $num_instances
+      #  machine.vm.provision "ansible" do |ansible|
+      #    ansible.limit = "all"
+      #    ansible.become = true
+      #    ansible.playbook = "deploy.yml"
+      #    ansible.host_key_checking = false
+      #    ansible.groups = {
+      #      "slave" => ["k8s-0[2:#{$num_instances}]"],
+      #      "master" => ["k8s-01"],
+      #    }
+      #  end
+      #end
+    end
+  end
+end
